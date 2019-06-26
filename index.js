@@ -196,12 +196,13 @@ async function main({ url, output, concurrency, silent }) {
 	console.log(`\rDownloaded ${output} in ${timer.end()}${ansi.eraseEndLine}`)
 }
 
-if (argv._.length !== 1) {
+if (argv._.length !== 1 || argv.help || argv.h) {
 	console.error(`usage: npx @karimsa/pull [options] <url>`)
 	console.error(
 		`\t-c, --concurrency [number]\tnumber of chunks to download file in`,
 	)
-	console.error(`\t-o, --output [file]\tset the output file`)
+	console.error(`\t-o, --output [file]\t\tset the output file`)
+	console.error(`\t-s, --silent\t\t\tdisable progress spinners`)
 	process.exit(1)
 }
 
