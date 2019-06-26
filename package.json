@@ -5,6 +5,9 @@
 	"bin": {
 		"pull": "./index.js"
 	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"dependencies": {
 		"ansi-escapes": "^4.2.0",
 		"ansi-styles": "^4.0.0",
