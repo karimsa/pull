@@ -2,6 +2,8 @@
 
 Download files using HTTP range transfers.
 
+![](.github/preview.gif)
+
 ## Usage
 
 Install via npm - `npm install -g @karimsa/pull` or use via npx `npx @karimsa/pull`.
