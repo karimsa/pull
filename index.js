@@ -17,6 +17,7 @@ const argv = require('minimist')(process.argv.slice(2))
 let spinnerLoc = -1
 let spinnerRender
 const spinnerChars = '⠄⠆⠇⠋⠙⠸⠰⠠⠰⠸⠙⠋⠇⠆'
+const checkmark = '\u001b[32m✓\u001b[39m'
 const labels = []
 const progress = []
 
@@ -39,7 +40,7 @@ function renderSpinners() {
 		// write spinner
 		const progress = Math.round(p * 100)
 		process.stdout.write(
-			`\r${progress === 100 ? '✓' : spinnerChars[spinnerLoc]} ${
+			`\r${progress === 100 ? checkmark : spinnerChars[spinnerLoc]} ${
 				labels[i]
 			} ${progress}% ${ansi.eraseEndLine}\n`,
 		)
