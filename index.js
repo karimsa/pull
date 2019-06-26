@@ -71,13 +71,13 @@ function prettyBytes(bytes) {
 	return bytes + 'b'
 }
 
-function downloadChunk(part, url, output, start, end) {
+function downloadChunk(part, url, output, start, end, { headers }) {
 	const outputStream = fs.createWriteStream(output)
 	const inputStream = requestRaw({
 		method: 'GET',
 		url,
 		headers: {
-			'User-Agent': '@karimsa/pull',
+			...headers,
 			Range: `bytes=${start}-${end - 1}`,
 		},
 		followAllRedirects: true,
@@ -127,14 +127,21 @@ function downloadChunk(part, url, output, start, end) {
 	})
 }
 
-async function main({ url, output, concurrency, silent }) {
+async function main({ url, output, concurrency, silent, headers }) {
 	const timer = prettyTime.start()
+
+	const headerMap = { 'User-Agent': '@karimsa/pull' }
+	headers.map(header => {
+		const key = header.substr(0, header.indexOf(':'))
+		const value = header.substr(header.indexOf(':') + 1)
+
+		headerMap[key] = value
+	})
+
 	const head = await request({
 		method: 'HEAD',
 		url,
-		headers: {
-			'User-Agent': '@karimsa/pull',
-		},
+		headers: headerMap,
 		resolveWithFullResponse: true,
 		followAllRedirects: true,
 	})
@@ -165,6 +172,9 @@ async function main({ url, output, concurrency, silent }) {
 				path.resolve(process.cwd(), output + '.p' + i),
 				start,
 				end,
+				{
+					headers: headerMap,
+				},
 			),
 		)
 	}
@@ -203,6 +213,7 @@ if (argv._.length !== 1 || argv.help || argv.h) {
 	)
 	console.error(`\t-o, --output [file]\t\tset the output file`)
 	console.error(`\t-s, --silent\t\t\tdisable progress spinners`)
+	console.error(`\t-H, --header [key: value]\tset a request header`)
 	process.exit(1)
 }
 
@@ -210,8 +221,14 @@ const dlUrl = argv._[0]
 const output = argv.output || argv.o || path.basename(new URL(dlUrl).pathname)
 const concurrency = Number(argv.concurrency || argv.c || 2 * os.cpus().length)
 const silent = !!(argv.silent || argv.s)
+const headers =
+	argv.header || argv.H
+		? Array.isArray(argv.header || argv.H)
+			? argv.header || argv.H
+			: [argv.header || argv.H]
+		: []
 
-main({ url: dlUrl, output, concurrency, silent }).catch(err => {
+main({ url: dlUrl, output, concurrency, silent, headers }).catch(err => {
 	console.error(err)
 	if (err.status) {
 	}
